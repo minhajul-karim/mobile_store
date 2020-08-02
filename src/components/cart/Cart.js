@@ -26,7 +26,7 @@ export default class Cart extends Component {
                   increment={increment}
                   decrement={decrement}
                 />
-                <Total context={context} />
+                <Total context={context} history={this.props.history} />
               </>
             )
           }
