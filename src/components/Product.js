@@ -13,7 +13,7 @@ export default class Product extends Component {
         {(context) => {
           return (
             <ProductWrapper
-              className="col-md-6 col-lg-3 my-3"
+              className="col-md-6 col-lg-4 my-3"
               onClick={() => context.getDetailProduct(id)}
             >
               <div className="card">
@@ -56,6 +56,10 @@ Product.propTypes = {
 }
 
 const ProductWrapper = styled.div`
+  .card {
+    border: 1px solid rgba(0, 0, 0, 0);
+    border-radius: 0rem;
+  }
   .card-body {
     overflow: hidden;
     position: relative;
@@ -80,6 +84,8 @@ const ProductWrapper = styled.div`
 
   .card-footer {
     font-size: 15px;
+    background-color: rgba(0, 0, 0, 0);
+    border-top: 1px solid rgba(0, 0, 0, 0);
   }
 
   .cart-button {

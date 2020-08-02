@@ -1,15 +1,15 @@
 import React, { Component, createContext } from 'react'
 import { storeProducts, detailProduct } from '../data'
 
-// create a context
+// Create a context
 const ProductsContext = createContext()
 
-// create a provider
+// Create a provider
 class ProductsProvider extends Component {
   constructor() {
     super()
     this.state = {
-      products: storeProducts,
+      products: [],
       detailProduct: detailProduct,
       cart: [],
       modalOpen: false,
@@ -19,11 +19,23 @@ class ProductsProvider extends Component {
     }
   }
 
+  // Copy storeProducts to state.products
+  setProducts = () => {
+    let tempProducts = []
+    storeProducts.forEach((item) => {
+      const singleProdcut = { ...item }
+      tempProducts = [...tempProducts, singleProdcut]
+    })
+    this.setState({ products: tempProducts })
+  }
+
+  // Get detail information of a product that has been clicked
   getDetailProduct = (id) => {
     const product = this.getProduct(id)
     this.setState({ detailProduct: product })
   }
 
+  // Add products to cart & calculate total price after setting state
   addToCart = (id) => {
     const products = [...this.state.products]
     let index = products.indexOf(this.getProduct(id)),
@@ -41,13 +53,26 @@ class ProductsProvider extends Component {
     )
   }
 
+  // Remove item from cart and update total price
   removeItem = (id) => {
-    const productsInCart = [...this.state.cart]
-    let index = productsInCart.indexOf(this.getProduct(id))
-    productsInCart.splice(index, 1)
-    this.setState({ cart: productsInCart }, () => this.getTotalPrice())
+    let tempProducts = [...this.state.products],
+      productsInCart = [...this.state.cart]
+    productsInCart = productsInCart.filter((item) => item.id !== id)
+    let index = tempProducts.indexOf(this.getProduct(id)),
+      curProduct = tempProducts[index]
+    curProduct.count = 0
+    curProduct.inCart = false
+    curProduct.total = 0
+    this.setState(
+      {
+        products: tempProducts,
+        cart: productsInCart,
+      },
+      () => this.getTotalPrice()
+    )
   }
 
+  // Retreive a product by id
   getProduct = (id) => this.state.products.find((elem) => elem.id === id)
 
   openModal = () => {
@@ -58,6 +83,9 @@ class ProductsProvider extends Component {
     this.setState({ modalOpen: false })
   }
 
+  /* Adds prices of products inside the cart & calculate
+   * total after adding tax on this
+   */
   getTotalPrice = () => {
     let subTotal = 0
     this.state.cart.forEach((item) => (subTotal += item.price * item.count))
@@ -70,21 +98,15 @@ class ProductsProvider extends Component {
     })
   }
 
+  // Clear cart, restore products & totals to initial state
   clearCart = () => {
-    this.setState({
-      cart: [],
-      subTotal: 0,
-      subTax: 0,
-      total: 0,
-      products: this.state.products.map((item) => {
-        if (item.inCart) {
-          item.inCart = false
-          return item
-        } else return item
-      }),
+    this.setState({ cart: [] }, () => {
+      this.setProducts()
+      this.getTotalPrice()
     })
   }
 
+  // Increment number of products
   increment = (id) => {
     const products = [...this.state.products]
     let index = products.indexOf(this.getProduct(id)),
@@ -101,6 +123,7 @@ class ProductsProvider extends Component {
     }
   }
 
+  // Decrement number of products
   decrement = (id) => {
     const products = [...this.state.products]
     let index = products.indexOf(this.getProduct(id)),
@@ -115,6 +138,10 @@ class ProductsProvider extends Component {
         () => this.getTotalPrice()
       )
     }
+  }
+
+  componentDidMount = () => {
+    this.setProducts()
   }
 
   render() {
@@ -138,7 +165,7 @@ class ProductsProvider extends Component {
   }
 }
 
-// create a consumer
+// Create a consumer
 const ProductsConsumer = ProductsContext.Consumer
 
 export { ProductsProvider, ProductsConsumer }
