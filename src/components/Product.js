@@ -30,6 +30,7 @@ export default class Product extends Component {
                     }}
                   >
                     {inCart ? 'in cart' : <i className="fas fa-cart-plus"></i>}
+                    {/* {inCart ? 'in cart' : 'add'} */}
                   </button>
                 </div>
                 <div className="card-footer">
